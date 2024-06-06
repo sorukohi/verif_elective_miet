@@ -16,7 +16,7 @@ module testbench;
 
     // TODO:
     // Определите период тактового сигнала
-    parameter CLK_PERIOD = // ?;
+    parameter CLK_PERIOD = 2;
 
     // TODO:
     // Cгенерируйте тактовый сигнал
@@ -28,6 +28,8 @@ module testbench;
         end
     end
 
+    localparam SEVERAL = 5;
+
     initial begin
 
         logic [31:0] A_tmp;
@@ -35,6 +37,10 @@ module testbench;
         // TODO:
         // Сгенерируйте несколько чисел в интервале от 0 до 25.
         // Используйте цикл + @(posedge clk).
+        for (int i = 0; i < SEVERAL; i++) begin
+            @(posedge clk);
+            A <= $urandom_range(0, 25);
+        end
 
 
         -> done_100;
@@ -44,6 +50,11 @@ module testbench;
         // Используйте цикл + @(posedge clk).
         // Подумайте, как сделать число четным после рандомизации.
 
+        for (int i = 0; i < SEVERAL; i++) begin
+            A_tmp <= $urandom();
+            @(posedge clk);
+            A <= {A_tmp[31:1], 0};
+        end
 
         -> done_2;
 
@@ -54,6 +65,14 @@ module testbench;
         // Здесь нужно рандомизировать число, пока не выполнится
         // условие деления на 3 без остатка: <число> % 3 == 0.
 
+        for (int i = 0; i < SEVERAL; i++) begin
+            do begin
+                A_tmp <= $urandom();
+            end
+            while(A_tmp % 3 == 0);
+            @(posedge clk);
+            A <= A_tmp;
+        end
 
         -> done_3;
 

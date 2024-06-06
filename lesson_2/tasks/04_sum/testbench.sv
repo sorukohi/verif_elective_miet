@@ -21,13 +21,15 @@ module testbench;
 
     // TODO:
     // Определите период тактового сигнала
-    parameter CLK_PERIOD = // ?;
+    parameter CLK_PERIOD = 2;
 
     // TODO:
     // Cгенерируйте тактовый сигнал
     initial begin
         clk <= 0;
         forever begin
+            #(CLK_PERIOD / 2);
+            clk <= ~clk;
             // Пишите тут.
         end
     end
@@ -52,10 +54,13 @@ module testbench;
     // Для оценки вы также можете воспользоваться файлом 
     // 04_sum/out/cov.ucdb
 
+    int i = 127;
+
     initial begin
         // Входные воздействия опишите здесь.
         // Не забудьте про ожидание сигнала сброса!
 
+        wait(aresetn);
         
         // TODO:
         // A: от 0 до 100 с шагом  1
@@ -63,13 +68,24 @@ module testbench;
         // Используйте for()
         // Помните про ожидание фронта через @(posedge clk).
     
+        for (int i = 0; i < 101; i++) begin
+            @(posedge clk);
+            A <= i;
+            B <= 100 - i;
+        end
 
         // TODO:
         // A: от 127 до 255 с шагом 4
         // B: от 127 до 255 с шагом 4
         // Используйте repeat()
         // Помните про ожидание фронта через @(posedge clk).
-
+        
+        repeat (32) begin
+            @(posedge clk);
+            A <= i;
+            B <= i; 
+            i <= i + 4;
+        end
 
         // TODO:
         // A: от 3FF до 103FE с шагом 5
@@ -77,6 +93,21 @@ module testbench;
         // Используйте for()
         // Помните про ожидание фронта через @(posedge clk).
 
+        fork
+            begin
+                for (int i = 'h3FF; i < 'h103FE; i = i + 5) begin
+                    @(posedge clk);
+                    A <= i;
+                end
+            end
+            begin
+                for (int j = 'hFFFFFFFF; j >= 'hFFFFBFFF; j = j - 32) begin
+                    @(posedge clk);
+                    B <= j; 
+                end
+            end
+            
+        join
 
         ->> gen_done;
 

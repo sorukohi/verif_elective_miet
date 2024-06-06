@@ -19,13 +19,14 @@ module testbench;
 
     // TODO:
     // Определите период тактового сигнала
-    parameter CLK_PERIOD = // ?;
+    parameter CLK_PERIOD = 2;// ?;
 
     // TODO:
     // Cгенерируйте тактовый сигнал
     initial begin
         clk <= 0;
         forever begin
+            #(CLK_PERIOD / 2) clk <= ~clk;
             // Пишите тут.
         end
     end
@@ -56,12 +57,76 @@ module testbench;
     initial begin
         // Входные воздействия опишите здесь.
         // Не забудьте про ожидание сигнала сброса!
-        $stop();
+        
+        wait(aresetn);
+
+        @(posedge clk);
+        A <= 2;
+        B <= 3;
+        @(posedge clk);
+        A <= 20;
+        B <= 30;
+        @(posedge clk);
+        @(posedge clk);
+        A <= 4;
+        B <= 5;
+        @(posedge clk);
+        A <= 40;
+        B <= 50;
+        @(posedge clk);
+        A <= 2;
+        B <= 1;
+
     end
+
+    int errors_amount = 0;
 
     initial begin
         // Проверки опишите здесь.
         // Не забудьте про ожидание сигнала сброса!
+
+        wait(aresetn);
+
+        @(posedge clk);
+        @(posedge clk);
+        @(posedge clk);         
+        if (C !== 5) begin 
+            $display("Time = %t: POOPER!!! Real C = %d, Expected = %d", $time(), C, 5); 
+            errors_amount++;
+        end
+
+        @(posedge clk);        
+        if (C !== 50) begin
+            $display("Time = %t: POOPER!!! Real C = %d, Expected = %d", $time(), C, 50);
+            errors_amount++;
+        end
+
+        @(posedge clk);
+        @(posedge clk);        
+        if (C !== 9) begin
+            $display("Time = %t: POOPER!!! Real C = %d, Expected = %d", $time(), C, 9);
+            errors_amount++;
+        end
+        
+        @(posedge clk);        
+        if (C !== 90) begin
+            $display("Time = %t: POOPER!!! Real C = %d, Expected = %d", $time(), C, 90);
+            errors_amount++;
+        end
+
+        @(posedge clk);        
+        if (C !== 3) begin
+            $display("Time = %t: POOPER!!! Real C = %d, Expected = %d", $time(), C, 3);
+            errors_amount++;
+        end
+
+        if (errors_amount == 0) begin
+            $display("GOOD!!!");
+            $finish();
+        end else begin
+            $display("BAD!!! %d ERRORS", errors_amount);
+            $finish();
+        end
     end
 
 endmodule

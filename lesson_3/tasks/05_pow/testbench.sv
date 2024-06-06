@@ -193,11 +193,14 @@ module testbench;
         m_tready <= 0;
     endtask
 
-    task do_slave_drive();
+    task do_slave_drive(
+        int slave_delay_min  = 0,     // минимальная задержка для slave
+        int slave_delay_max  = 10    // максимальная задержка для slave
+    );
         reset_slave();
         @(posedge clk);
         forever begin
-            drive_slave($urandom_range(0, 10));
+            drive_slave($urandom_range(slave_delay_min, slave_delay_max));
         end
     endtask
 
@@ -220,9 +223,12 @@ module testbench;
     endtask
 
     // Slave
-    task slave();
+    task slave(
+        int slave_delay_min  = 0,     // минимальная задержка для slave
+        int slave_delay_max  = 10     // максимальная задержка для slave
+    );
         fork
-            do_slave_drive();
+            do_slave_drive(slave_delay_min, slave_delay_max);
             do_slave_monitor();
         join
     endtask
@@ -243,8 +249,9 @@ module testbench;
         end
     endtask
 
+    int cnt;
+
     task do_check(int pkt_amount = 1);
-        int cnt;
         packet in_p, out_p;
         forever begin
             in_mbx.get(in_p);
@@ -311,7 +318,7 @@ module testbench;
             .gen_delay_max  (    20),
             .slave_delay_min(     0),
             .slave_delay_max(     5),
-            .timeout_cycles (100000)
+            .timeout_cycles (1000000)
         );
     end
 
