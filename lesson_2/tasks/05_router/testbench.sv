@@ -90,8 +90,12 @@ module testbench;
         forever begin
             mon2chk.get(pkt_cur);
             for (int i = 0; i < 4; i++) begin
-                if (pkt_prev.sel[i] == pkt_prev.in[i] && pkt_cur.out[i] != pkt_prev.in[i]) $display("Time: %0t | ERROR: sel dont switch in to out: sel[%0d] = %0d, in = %0b, out = %0b",
-                    $time(), i, pkt_prev.sel[i], pkt_prev.in, pkt_cur.out);
+                for (int j = 0; j < 4; j++) begin
+                    // Если sel [0][1:0] равен 0, то out[0] <= in[0]
+                    // Если sel [0][1:0] равен 1, то out[1] <= in[0]
+                    if (pkt_prev.sel[i] == pkt_prev.in[i] && pkt_cur.out[j] != pkt_prev.in[i]) $display("Time: %0t | ERROR: sel dont switch in to out: sel[%0d] = %0d, in = %0b, out = %0b",
+                        $time(), i, pkt_prev.sel[i], pkt_prev.in, pkt_cur.out);
+                end
             end
             pkt_prev = pkt_cur;
         end
