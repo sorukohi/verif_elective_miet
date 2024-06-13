@@ -204,6 +204,7 @@ initial begin
             $display("my_class_6.tlast.size() = %0d", cl_6.tlast.size());
         end
         foreach(cl_6.tlast[i]) begin
+            $display("i = %0d", i);
             if(cl_6.tlast[i]) begin
                 if(tlast_cnt < 3 && tlast_ind) begin
                     $error("my_class_6.tlast is 1 but only %0d tlasts were 0 before last 1", tlast_cnt);
@@ -214,6 +215,7 @@ initial begin
             end
             else tlast_cnt = tlast_cnt + 1;
         end
+        tlast_ind = 0;
     end
         
     $display("Test was finished! You are good if no errors.");
